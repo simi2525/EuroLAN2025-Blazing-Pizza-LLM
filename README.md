@@ -1,17 +1,42 @@
-# BlazingPizzaWorkshop
-The Blazing Pizza Workshop, updated for .NET 8
+## Blazing Pizza (Clean Reference)
 
-Updated and derived from https://github.com/csharpfritz/blazor-workshop
+Minimal, ready-to-run Blazor (.NET 8) app used as a reference for LLM workshop demos.
 
-Watch the videos that accompany this at:  https://www.youtube.com/watch?v=sWTpxFcHbfY&list=PLdo4fOcmZ0oXv32dOd36UydQYLejKR61R&index=78 
+### Prerequisites
+- **.NET 9 SDK** (recommended) or newer SDK capable of targeting `net9.0`.
+- macOS/Linux/Windows terminal access.
 
-Here are the list of modules that accompany this workshop:
+If you see HTTPS errors on first run, trust the local dev cert:
+```bash
+dotnet dev-certs https --trust
+```
 
-| Title |
-| --- |
-| [Get Started with Blazor](docs/00-get-started.md) |
-| [Building our first home screen and learning about interactivity](docs/01-HomeScreen.md) |
-| [Our first component and Managing State](docs/02-managing-state.md) |
-| [Validating Data](docs/03-validation.md) |
-| [Authenticating Users with Blazor](docs/04-authentication.md) |
-| [Sharing Components with other projects](docs/05-components.md) |
+### How to run
+From the repository root:
+```bash
+dotnet restore
+dotnet build
+dotnet run --project src/BlazingPizza/BlazingPizza.csproj
+```
+
+The server will print the listening URLs (typically `https://localhost:<port>`). Open that URL in your browser.
+
+For hot reload during development:
+```bash
+dotnet watch --project src/BlazingPizza/BlazingPizza.csproj
+```
+
+### What’s included
+- Single solution under `src/` with projects:
+  - `BlazingPizza` (server + host)
+  - `BlazingPizza.Client` (WASM referenced by server)
+  - `BlazingPizza.ComponentsLibrary`
+  - `BlazingPizza.Shared`
+- SQLite database auto-creates on first run with sample data (`Data Source=pizza.db`).
+
+### Sign-in / Accounts
+- You can register a user from the app UI. Email sending is disabled in dev.
+- If your environment enforces email confirmation and blocks sign-in, set `RequireConfirmedAccount = false` in `src/BlazingPizza/Program.cs` and re-run.
+
+### Clean repo
+All workshop notes, docs, and save-points were removed to keep the codebase focused on the runnable reference implementation.
