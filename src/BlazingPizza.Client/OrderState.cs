@@ -14,7 +14,7 @@ public class OrderState
 	public Order Order { get; set; } = new Order();
 
 	[JsonIgnore]
-	public IJSRuntime JSRuntime { get; set; }
+	public IJSRuntime? JSRuntime { get; set; }
 
 	public void ShowConfigurePizzaDialog(PizzaSpecial special)
 	{
@@ -73,9 +73,10 @@ public class OrderState
 
 	}
 
-	public async Task SaveStateToStorage(IJSRuntime jsRuntime)
+	public async Task SaveStateToStorage(IJSRuntime? jsRuntime)
 	{
 
+		if (jsRuntime is null) return;
 		var stateAsJson = JsonSerializer.Serialize(this, new JsonSerializerOptions { IncludeFields = true });
 		await jsRuntime.InvokeVoidAsync("sessionStorage.setItem", "blazingPizza.orderState", stateAsJson);
 

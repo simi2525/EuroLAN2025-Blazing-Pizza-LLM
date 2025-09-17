@@ -12,10 +12,10 @@
 	<ul class="pizza-cards">
 		@if (specials is not null)
 		{
-			@foreach (var special in specials)
-			{
-				<li @onclick="@(()=>OrderState.ShowConfigurePizzaDialog(special))" style="background-image: url('@special.ImageUrl')">
-					<div class="pizza-info">
+            @foreach (var special in specials)
+            {
+                <li style="background-image: url('@special.ImageUrl')">
+                    <div class="pizza-info" role="button" tabindex="0" @onclick="@(()=>SelectSpecial(special))">
 						<span class="title">@special.Name</span>
 						@special.Description
 						<span class="price">@special.GetFormattedBasePrice()</span>
@@ -54,8 +54,8 @@
 
 <BlazingPizza.ComponentsLibrary.TemplatedDialog Show="OrderState.ShowingConfigureDialog">
 	<ConfigurePizzaDialog Pizza="OrderState.ConfiguringPizza"
-												OnCancel="OrderState.CancelConfigurePizzaDialog"
-												OnConfirm="OrderState.ConfirmConfigurePizzaDialog" />
+									OnCancel="CancelConfigure"
+									OnConfirm="ConfirmConfigure" />
 </BlazingPizza.ComponentsLibrary.TemplatedDialog>
 
 @code {
@@ -74,5 +74,23 @@
 			OrderState.RemoveConfiguredPizza(configuredPizza);
 		}
 	}
+
+    void SelectSpecial(PizzaSpecial special)
+    {
+        OrderState.ShowConfigurePizzaDialog(special);
+        StateHasChanged();
+    }
+
+    void CancelConfigure()
+    {
+        OrderState.CancelConfigurePizzaDialog();
+        StateHasChanged();
+    }
+
+    void ConfirmConfigure()
+    {
+        OrderState.ConfirmConfigurePizzaDialog();
+        StateHasChanged();
+    }
 
 }

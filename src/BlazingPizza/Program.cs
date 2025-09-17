@@ -5,6 +5,7 @@ using BlazingPizza.Components;
 using BlazingPizza.Components.Account;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
 		.AddInteractiveServerComponents()
 		.AddInteractiveWebAssemblyComponents();
+
+// Ensure static web assets from referenced projects/libraries are served (e.g., _content/* and _framework/*)
+builder.WebHost.UseStaticWebAssets();
 
 
 // Add Security
