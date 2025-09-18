@@ -1,0 +1,78 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "1 - AI Integration: Cart Assistant",
+  "description": "Walkthrough of the LLM-powered cart planning flow: config, endpoints, and UI.",
+  "isPrimary": true,
+  "steps": [
+    {
+      "title": "Overview",
+      "description": "### What this tour covers\n\n- **Goal**: Let users describe pizzas in natural language; the app plans cart actions via an LLM.\n- **Flow**: UI → `api/assist/cart` → LLM → JSON plan → apply to order.\n- **Files**: Config, server controller + contracts, client UI (inline assistant + page)."
+    },
+    {
+      "title": "NuGet: OpenAI client",
+      "file": "src/BlazingPizza/BlazingPizza.csproj",
+      "pattern": "OpenAI",
+      "description": "Adds the `OpenAI` package (used by `AI/LlmRegistration.cs`). Current controller calls the REST API directly, but this package enables SDK usage as an alternative."
+    },
+    {
+      "title": "LLM configuration",
+      "file": "src/BlazingPizza/appsettings.Development.json",
+      "pattern": "\"LLM\"",
+      "description": "### LLM settings\n- **Provider**: `openai` or `ollama`.\n- **Model**: Name to use for chat completions.\n- **OpenAI.ApiKey**: Prefer env var `OPENAI_API_KEY` in development.\n- **Ollama.BaseUrl**: Local endpoint (if using Ollama).\n\nNote: Secrets should come from environment/Key Vault rather than committing keys."
+    },
+    {
+      "title": "AssistController: routing & auth",
+      "file": "src/BlazingPizza/AssistController.cs",
+      "pattern": "\\[Route\\(\"api/assist\"\\)\\]",
+      "description": "Controller hosts the AI endpoints under `api/assist`. Marked `[AllowAnonymous]` so cart assistance works before sign-in."
+    },
+    {
+      "title": "Search endpoint (specials & toppings)",
+      "file": "src/BlazingPizza/AssistController.cs",
+      "pattern": "\\[HttpGet\\(\"search\"\\)\\]",
+      "description": "`GET /api/assist/search?q=` uses EF Core to search specials by name/description and toppings by name. Returns `SearchResult[]` for prompting/UX autocomplete."
+    },
+    {
+      "title": "Cart planning via LLM",
+      "file": "src/BlazingPizza/AssistController.cs",
+      "pattern": "\\[HttpPost\\(\"cart\"\\)\\]",
+      "description": "`POST /api/assist/cart` builds a MENU context (sizes, specials, toppings), crafts a strict system prompt, calls `chat/completions`, expects a JSON object, and parses it into `CartPlan`. The plan contains `actions` like `add_pizza` or `clear_cart`."
+    },
+    {
+      "title": "LLM settings resolution",
+      "file": "src/BlazingPizza/AssistController.cs",
+      "pattern": "GetLlmSettings\\(",
+      "description": "Resolves provider, base URL, API key, and model from `LLM` config. Supports both OpenAI-compatible endpoints and local Ollama."
+    },
+    {
+      "title": "Contracts for AI",
+      "file": "src/BlazingPizza/AI/Contracts.cs",
+      "pattern": "CartAction\\(",
+      "description": "Data contracts used across the AI flow:\n- `CartRequest(utterance)`\n- `CartAction(type, specialId?, quantity, size, toppingIds?)`\n- `CartPlan(actions)`\n- `SearchResult` for autocomplete."
+    },
+    {
+      "title": "Inline assistant in Home.razor",
+      "file": "src/BlazingPizza.Client/Components/Pages/Home.razor",
+      "pattern": "Inline Cart Assistant",
+      "description": "A compact assistant UI in the sidebar posts to `api/assist/cart`, reads a `CartPlan`, and applies actions to `OrderState` (adding pizzas and toppings)."
+    },
+    {
+      "title": "Applying the plan (client)",
+      "file": "src/BlazingPizza.Client/Components/Pages/Home.razor",
+      "pattern": "api/assist/cart",
+      "description": "`RunAssistant()` posts the utterance, deserializes `CartPlan`, clamps sizes, maps `specialId`/`toppingIds` to objects, and mutates the order."
+    },
+    {
+      "title": "Cart context and identifiers",
+      "description": "To support editing/removing items via LLM, expose a compact cart summary (per-item id/index, name, size, toppings) to the model. Easiest path: include it in the `POST /api/assist/cart` request body from the client."
+    },
+    {
+      "title": "Homework: edit/remove via LLM",
+      "description": "Add new actions to the plan schema: `update_pizza` (fields: `cartIndex|cartItemId`, optional `size`, `addToppingIds`, `removeToppingIds`) and `remove_pizza` (`cartIndex|cartItemId`). Update system prompt and client apply-logic in `Home.razor` to handle them. Show a stable id or 1-based index in the cart UI."
+    },
+    {
+      "title": "Try it out",
+      "description": "### Run locally\n\n>> dotnet run --project src/BlazingPizza/BlazingPizza.csproj\n\nThen open the home page and use the inline assistant, or navigate to `/assist/cart`. Example: _Add two pepperoni 12\" with extra cheese_."
+    }
+  ]
+}
