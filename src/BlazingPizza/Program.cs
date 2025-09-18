@@ -10,6 +10,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Always include Development settings to simplify workshop setup
+builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
 		.AddInteractiveServerComponents()
@@ -18,6 +21,8 @@ builder.Services.AddRazorComponents()
 // Ensure static web assets from referenced projects/libraries are served (e.g., _content/* and _framework/*)
 builder.WebHost.UseStaticWebAssets();
 
+// HttpClient factory for REST calls to OpenAI/Ollama
+builder.Services.AddHttpClient();
 
 // Add Security
 builder.Services.AddCascadingAuthenticationState();
@@ -74,9 +79,8 @@ else
 	app.UseExceptionHandler("/Error", createScopeForErrors: true);
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
+	app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
