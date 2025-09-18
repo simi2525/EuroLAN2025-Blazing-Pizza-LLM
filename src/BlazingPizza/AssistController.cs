@@ -95,7 +95,7 @@ public sealed class AssistController : ControllerBase
         var system = string.Join("\n", new[]
         {
             "You are a strict pizza cart planner.",
-            "Only output a single JSON object matching this schema: {\"actions\": [{\"type\": \"add_pizza|clear_cart\", \"specialId\": number?, \"quantity\": number, \"size\": number, \"toppingIds\": number[]?}]}.",
+            "Only output a single JSON object matching this schema: {\"actions\": [{\"type\": \"add_pizza|clear_cart\", \"specialId\": number?, \"quantity\": number, \"size\": number, \"toppingIds\": number[]?}] }.",
             "Rules:",
             "- Choose specialId ONLY from the provided MENU JSON below.",
             "- Choose toppingIds ONLY from the provided MENU JSON below.",

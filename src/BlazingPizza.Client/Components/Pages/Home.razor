@@ -112,7 +112,18 @@ List<Topping>? toppings;
         try
         {
             using var http = new HttpClient { BaseAddress = new Uri(NavigationManager.BaseUri) };
-            var res = await http.PostAsJsonAsync("api/assist/cart", new { utterance = assistantUtterance });
+
+            var cartSummary = OrderState.Order.Pizzas
+                .Select((p, i) => new {
+                    idx = i + 1,
+                    specialId = p.SpecialId,
+                    size = p.Size,
+                    toppingIds = p.Toppings.Select(t => t.ToppingId).ToArray(),
+                    label = $"{p.Size}\" {p.Special?.Name}"
+                })
+                .ToArray();
+
+            var res = await http.PostAsJsonAsync("api/assist/cart", new { utterance = assistantUtterance, cart = cartSummary });
             CartPlan? plan = null;
             try { plan = await res.Content.ReadFromJsonAsync<CartPlan>(); }
             catch { }
@@ -142,6 +153,10 @@ List<Topping>? toppings;
                             OrderState.Order.Pizzas.Add(p);
                         }
                         break;
+                    // remove_item and edit_item are intentionally left unimplemented for the workshop exercise.
+                    // case "remove_item":
+                    // case "edit_item":
+                    //     break;
                 }
             }
             StateHasChanged();
@@ -157,6 +172,7 @@ List<Topping>? toppings;
     }
 
     public record CartPlan(CartAction[] Actions);
-    public record CartAction(string Type, int? SpecialId, int Quantity, int Size, int[]? ToppingIds);
+    public record CartAction(string Type, int? SpecialId, int Quantity, int Size, int[]? ToppingIds,
+                             int? TargetIdx, int? NewSize, int[]? AddToppingIds, int[]? RemoveToppingIds, int[]? SetToppingIds);
 
 }
